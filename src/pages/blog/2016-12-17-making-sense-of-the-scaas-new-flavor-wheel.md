@@ -8,6 +8,8 @@ description: >-
 tags:
   - flavor
   - tasting
+thumbnail: /img/flavor_wheel.jpg
+rating: '5'
 ---
 
 ![flavor wheel](/img/flavor_wheel.jpg)
