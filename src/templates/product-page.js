@@ -1,10 +1,13 @@
-import React from 'react'
-import PropTypes from 'prop-types'
-import { graphql } from 'gatsby'
-import Layout from '../components/Layout'
-import Features from '../components/Features'
-import Testimonials from '../components/Testimonials'
-import Pricing from '../components/Pricing'
+import React from 'react';
+import PropTypes from 'prop-types';
+import Helmet from 'react-helmet'
+import { graphql } from 'gatsby';
+
+import config from '../../config/site';
+import Layout from '../components/Layout';
+import Features from '../components/Features';
+import Testimonials from '../components/Testimonials';
+import Pricing from '../components/Pricing';
 
 export const ProductPageTemplate = ({
   image,
@@ -132,20 +135,22 @@ ProductPageTemplate.propTypes = {
 }
 
 const ProductPage = ({ data }) => {
-  const { frontmatter } = data.markdownRemark
+  const { frontmatter } = data.markdownRemark;
+  const { title, image, heading, description, intro, main, testimonials, full_img: fullImg, pricing } = frontmatter;
 
   return (
     <Layout>
+      <Helmet title={`${title} | ${config.siteTitle}`} />
       <ProductPageTemplate
-        image={frontmatter.image}
-        title={frontmatter.title}
-        heading={frontmatter.heading}
-        description={frontmatter.description}
-        intro={frontmatter.intro}
-        main={frontmatter.main}
-        testimonials={frontmatter.testimonials}
-        fullImage={frontmatter.full_image}
-        pricing={frontmatter.pricing}
+        image={image}
+        title={title}
+        heading={heading}
+        description={description}
+        intro={intro}
+        main={main}
+        testimonials={testimonials}
+        fullImage={fullImg}
+        pricing={pricing}
       />
     </Layout>
   )
