@@ -1,36 +1,79 @@
-backend:
-  name: git-gateway
-  branch: master
 
-media_folder: static/img
-public_folder: /img
+backend: # https://www.netlifycms.org/docs/authentication-backends/
+  name: git-gateway # Netlify open source project that allows you to add editors to your site CMS without giving them direct write access to your GitHub or GitLab repository
+  branch: content
+  accept_roles: # (optional) accepts all users if left out
+    - admin
+    - editor
 
-collections:
-  - name: "blog"
-    label: "Blog"
-    folder: "src/pages/blog"
-    create: true
-    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
-    fields:
+# Fields
+heroField: &hero {label: Hero, name: hero, widget: object, fields: [
+    {label: "Featured Image", name: "image", widget: "image"},
+    {label: "Heading", name: "heading", widget: "string"},
+    {label: Content, name: content, widget: markdown, buttons: ['bold', 'italic', 'link']}
+  ]}
+componentsField: &components {label: Components, name: components, widget: list, fields: [
+    *hero,
+  ]}
+
+media_folder: static/img # (required) Folder path where uploaded files should be saved, relative to the base of the repo
+public_folder: /img # Folder path where uploaded files will be accessed, relative to the base of the built site
+
+# publish_mode: editorial_workflow # Enables drafts workflow (creates git branch w/ changes, edits pushes to branch, approve merges branch)
+
+display_url: https://the-waterfalls.netlify.com # Display link to site in admin header
+
+collections: # https://www.netlifycms.org/docs/configuration-options/#collections, https://www.netlifycms.org/docs/collection-types/
+
+  - name: "blog" # (required) unique identifier for the collection, used as the key when referenced in other contexts (e.g. relation widget, routes: /admin/collections/blog
+    label: "Blog Posts" # Used in the UI; defaults to the value of `name`
+    label_singular: "Blog Post" # singular label for certain elements in the editor; defaults to the value of `label`
+    folder: "src/pages/blog" # The path to the folder where the content documents are stored
+    create: true # Allow users to create new documents "folder" collections
+    slug: "{{slug}}" # Filename template, e.g. "{{year}}-{{month}}-{{day}}-{{slug}}" --> YYYY-MM-DD-title.md (https://www.netlifycms.org/docs/configuration-options/#slug)
+    delete: true # Prevents users from deleting items in a collection; defaults to true
+    fields: # The fields for each document, usually in front matter (https://www.netlifycms.org/docs/configuration-options/#fields, https://www.netlifycms.org/docs/widgets)
       - {label: "Template Key", name: "templateKey", widget: "hidden", default: "blog-post"}
       - {label: "Title", name: "title", widget: "string"}
       - {label: "Publish Date", name: "date", widget: "datetime"}
-      - {label: "Description", name: "description", widget: "text"}
+      - {label: "Description", name: "description", widget: "text", pattern: [".{55,}", "Must have at least 55 characters"]}
       - {label: "Body", name: "body", widget: "markdown"}
       - {label: "Tags", name: "tags", widget: "list"}
+      - {label: "Featured Image", name: "thumbnail", widget: "image"}
+      - {label: "Rating (scale of 1-5)", name: "rating", widget: "number", pattern: ["^[0-5]$", "Rating must be between 0 and 5"]}
+      - {label: "Featured?", name: "featured", widget: "boolean", default: false}
 
-  - name: "pages"
-    label: "Pages"
+  - name: "singles"
+    label: "Single Pages"
     files:
-      - file: "src/pages/about/index.md"
-        label: "About"
+
+      - label: "Home"
+        file: "data/pages/home/index.md" # ! Changes should be reflected in `/gatsby-config.js`
+        name: "home"
+        fields:
+          - {label: "Template Key", name: "templateKey", widget: "hidden", default: "home-page"}
+          - {label: "Title", name: "title", widget: "string"}
+          - *components
+          - {label: Hero Carousel, name: carousel, widget: list, fields: [
+              {label: Heading, name: heading, widget: string},
+              {label: Content, name: content, widget: markdown},
+              {label: "Featured Image", name: "image", widget: "image"},
+              {label: "Reference Post", name: "post", widget: "relation", collection: "blog", searchFields: ["title"], valueField: "name"}
+            ]}
+
+      - label: "About"
+        file: "src/pages/about/index.md" # ! Changes should be reflected in `/gatsby-config.js`
         name: "about"
         fields:
+          # - *hero
+          # - *components
           - {label: "Template Key", name: "templateKey", widget: "hidden", default: "about-page"}
           - {label: "Title", name: "title", widget: "string"}
+          - {label: "Matrix", name: "matrix", widget: "matrix"}
           - {label: "Body", name: "body", widget: "markdown"}
-      - file: "src/pages/products/index.md"
-        label: "Products Page"
+
+      - label: "Products"
+        file: "src/pages/products/index.md" # ! Changes should be reflected in `/gatsby-config.js`
         name: "products"
         fields:
           - {label: "Template Key", name: "templateKey", widget: "hidden", default: "product-page"}
@@ -38,8 +81,42 @@ collections:
           - {label: Image, name: image, widget: image}
           - {label: Heading, name: heading, widget: string}
           - {label: Description, name: description, widget: string}
-          - {label: Intro, name: intro, widget: object, fields: [{label: Heading, name: heading, widget: string}, {label: Description, name: description, widget: text}, {label: Blurbs, name: blurbs, widget: list, fields: [{label: Image, name: image, widget: image}, {label: Text, name: text, widget: text}]}]}
-          - {label: Main, name: main, widget: object, fields: [{label: Heading, name: heading, widget: string}, {label: Description, name: description, widget: text}, {label: Image1, name: image1, widget: object, fields: [{label: Image, name: image, widget: image}, {label: Alt, name: alt, widget: string}]}, {label: Image2, name: image2, widget: object, fields: [{label: Image, name: image, widget: image}, {label: Alt, name: alt, widget: string}]}, {label: Image3, name: image3, widget: object, fields: [{label: Image, name: image, widget: image}, {label: Alt, name: alt, widget: string}]}]}
-          - {label: Testimonials, name: testimonials, widget: list, fields: [{label: Quote, name: quote, widget: string}, {label: Author, name: author, widget: string}]}
+          - {label: Intro, name: intro, widget: object, fields: [
+              {label: Heading, name: heading, widget: string},
+              {label: Description, name: description, widget: text},
+              {label: Blurbs, name: blurbs, widget: list, fields: [
+                {label: Image, name: image, widget: image},
+                {label: Text, name: text, widget: text}
+              ]}
+            ]}
+          - {label: Main, name: main, widget: object, fields: [
+              {label: Heading, name: heading, widget: string},
+              {label: Description, name: description, widget: text},
+              {label: Image1, name: image1, widget: object, fields: [
+                {label: Image, name: image, widget: image},
+                {label: Alt, name: alt, widget: string}
+              ]},
+              {label: Image2, name: image2, widget: object, fields: [
+                {label: Image, name: image, widget: image},
+                {label: Alt, name: alt, widget: string}
+              ]},
+              {label: Image3, name: image3, widget: object, fields: [
+                {label: Image, name: image, widget: image},
+                {label: Alt, name: alt, widget: string}
+              ]}
+            ]}
+          - {label: Testimonials, name: testimonials, widget: list, fields: [
+              {label: Quote, name: quote, widget: string},
+              {label: Author, name: author, widget: string}
+            ]}
           - {label: Full_image, name: full_image, widget: image}
-          - {label: Pricing, name: pricing, widget: object, fields: [{label: Heading, name: heading, widget: string}, {label: Description, name: description, widget: string}, {label: Plans, name: plans, widget: list, fields: [{label: Plan, name: plan, widget: string}, {label: Price, name: price, widget: string}, {label: Description, name: description, widget: string}, {label: Items, name: items, widget: list}]}]}
+          - {label: Pricing, name: pricing, widget: object, fields: [
+              {label: Heading, name: heading, widget: string},
+              {label: Description, name: description, widget: string},
+              {label: Plans, name: plans, widget: list, fields: [
+                {label: Plan, name: plan, widget: string},
+                {label: Price, name: price, widget: string},
+                {label: Description, name: description, widget: string},
+                {label: Items, name: items, widget: list}
+              ]}
+            ]}
