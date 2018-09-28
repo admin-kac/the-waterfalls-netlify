@@ -26,10 +26,10 @@ module.exports = {
       },
     },
     {
-      // Resolve "pages" markdown to path
+      // Resolve data markdown to path
       resolve: 'gatsby-source-filesystem',
       options: {
-        path: `${__dirname}/${pathsConfig.pages}`,
+        path: `${__dirname}/${pathsConfig.data}`,
         name: 'pages',
       },
     },
