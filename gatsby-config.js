@@ -22,7 +22,7 @@ module.exports = {
         background_color: themeConfig.primaryColor,
         theme_color: themeConfig.primaryColor,
         display: 'minimal-ui',
-        icon: 'src/img/logo.svg', // This path is relative to the root of the site.
+        icon: 'src/img/icon.svg', // Compiles file to icon (w/ sizes) into /public. This path is relative to the root of the site.
       },
     },
     {
