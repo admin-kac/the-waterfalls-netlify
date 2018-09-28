@@ -3,6 +3,25 @@ const path = require('path');
 const { createFilePath } = require('gatsby-source-filesystem');
 const pathsConfig = require('./config/paths');
 
+exports.onCreateNode = ({ node, actions, getNode }) => {
+  const { createNodeField } = actions;
+
+  if (node.internal.type === `MarkdownRemark`) {
+    // Generate file path from file path starting @ `basePath` (https://www.gatsbyjs.org/packages/gatsby-source-filesystem/#createfilepath)
+    const filePath = createFilePath({
+      node,
+      getNode,
+      basePath: pathsConfig.data,
+    });
+    // Append new queryable slug node field w/ the filepath
+    createNodeField({
+      name: `slug`,
+      node,
+      value: filePath,
+    });
+  }
+};
+
 exports.createPages = ({ actions, graphql }) => {
   const { createPage } = actions;
 
@@ -18,6 +37,7 @@ exports.createPages = ({ actions, graphql }) => {
             frontmatter {
               tags
               templateKey
+              path
             }
           }
         }
@@ -30,13 +50,13 @@ exports.createPages = ({ actions, graphql }) => {
       return Promise.reject(result.errors);
     }
 
-    const posts = result.data.allMarkdownRemark.edges;
+    const entries = result.data.allMarkdownRemark.edges;
 
-    posts.forEach(edge => {
+    entries.forEach(edge => {
       const id = edge.node.id;
 
       createPage({
-        path: edge.node.fields.slug,
+        path: edge.node.frontmatter.path || edge.node.fields.slug, // check for a path first
         tags: edge.node.frontmatter.tags,
         component: path.resolve(
           `${pathsConfig.views}/${String(edge.node.frontmatter.templateKey)}.js`
@@ -51,7 +71,7 @@ exports.createPages = ({ actions, graphql }) => {
     // Tag pages:
     let tags = [];
     // Iterate through each post, putting all found tags into `tags`
-    posts.forEach(edge => {
+    entries.forEach(edge => {
       if (_.get(edge, `node.frontmatter.tags`)) {
         tags = tags.concat(edge.node.frontmatter.tags);
       }
@@ -72,17 +92,4 @@ exports.createPages = ({ actions, graphql }) => {
       });
     });
   });
-};
-
-exports.onCreateNode = ({ node, actions, getNode }) => {
-  const { createNodeField } = actions;
-
-  if (node.internal.type === `MarkdownRemark`) {
-    const value = createFilePath({ node, getNode });
-    createNodeField({
-      name: `slug`,
-      node,
-      value,
-    });
-  }
 };
