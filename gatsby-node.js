@@ -1,6 +1,7 @@
 const _ = require('lodash');
 const path = require('path');
 const { createFilePath } = require('gatsby-source-filesystem');
+const pathsConfig = require('./config/paths');
 
 exports.createPages = ({ actions, graphql }) => {
   const { createPage } = actions;
@@ -37,7 +38,7 @@ exports.createPages = ({ actions, graphql }) => {
         path: edge.node.fields.slug,
         tags: edge.node.frontmatter.tags,
         component: path.resolve(
-          `src/templates/${String(edge.node.frontmatter.templateKey)}.js`
+          `${pathsConfig.views}/${String(edge.node.frontmatter.templateKey)}.js`
         ),
         // additional data can be passed via context
         context: {
@@ -59,11 +60,11 @@ exports.createPages = ({ actions, graphql }) => {
 
     // Make tag pages
     tags.forEach(tag => {
-      const tagPath = `/tags/${_.kebabCase(tag)}/`
+      const tagRoute = `/tags/${_.kebabCase(tag)}/`
 
       createPage({
-        path: tagPath,
-        component: path.resolve(`src/templates/tags.js`),
+        path: tagRoute,
+        component: path.resolve(`${pathsConfig.views}/tags.js`),
         context: {
           tag,
         },

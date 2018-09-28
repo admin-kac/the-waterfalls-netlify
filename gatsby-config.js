@@ -1,5 +1,6 @@
 const siteConfig = require('./config/site');
 const themeConfig = require('./config/theme');
+const pathsConfig = require('./config/paths');
 
 module.exports = {
   siteMetadata: {
@@ -28,7 +29,7 @@ module.exports = {
       // Resolve "pages" markdown to path
       resolve: 'gatsby-source-filesystem',
       options: {
-        path: `${__dirname}/src/pages`,
+        path: `${__dirname}/${pathsConfig.pages}`,
         name: 'pages',
       },
     },

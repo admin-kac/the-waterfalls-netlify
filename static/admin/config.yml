@@ -1,7 +1,7 @@
 
 backend: # https://www.netlifycms.org/docs/authentication-backends/
   name: git-gateway # Netlify open source project that allows you to add editors to your site CMS without giving them direct write access to your GitHub or GitLab repository
-  branch: content
+  branch: master
   accept_roles: # (optional) accepts all users if left out
     - admin
     - editor
@@ -28,7 +28,7 @@ collections: # https://www.netlifycms.org/docs/configuration-options/#collection
   - name: "blog" # (required) unique identifier for the collection, used as the key when referenced in other contexts (e.g. relation widget, routes: /admin/collections/blog
     label: "Blog Posts" # Used in the UI; defaults to the value of `name`
     label_singular: "Blog Post" # singular label for certain elements in the editor; defaults to the value of `label`
-    folder: "src/pages/blog" # The path to the folder where the content documents are stored
+    folder: "data/blog" # The path to the folder where the content documents are stored
     create: true # Allow users to create new documents "folder" collections
     slug: "{{slug}}" # Filename template, e.g. "{{year}}-{{month}}-{{day}}-{{slug}}" --> YYYY-MM-DD-title.md (https://www.netlifycms.org/docs/configuration-options/#slug)
     delete: true # Prevents users from deleting items in a collection; defaults to true
@@ -62,7 +62,7 @@ collections: # https://www.netlifycms.org/docs/configuration-options/#collection
             ]}
 
       - label: "About"
-        file: "src/pages/about/index.md" # ! Changes should be reflected in `/gatsby-config.js`
+        file: "data/pages/about/index.md" # ! Changes should be reflected in `/gatsby-config.js`
         name: "about"
         fields:
           # - *hero
@@ -73,7 +73,7 @@ collections: # https://www.netlifycms.org/docs/configuration-options/#collection
           - {label: "Body", name: "body", widget: "markdown"}
 
       - label: "Products"
-        file: "src/pages/products/index.md" # ! Changes should be reflected in `/gatsby-config.js`
+        file: "data/pages/products/index.md" # ! Changes should be reflected in `/gatsby-config.js`
         name: "products"
         fields:
           - {label: "Template Key", name: "templateKey", widget: "hidden", default: "product-page"}
