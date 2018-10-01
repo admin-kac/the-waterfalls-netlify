@@ -1,6 +1,6 @@
 ---
 templateKey: home-page
-path: /
+path: /home
 title: Home!!
 components:
   - hero:
